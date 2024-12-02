@@ -37,6 +37,13 @@
 #define SE_SHA256_BUFFER_LENGTH  32
 #define SE_CERT_BUFFER_LENGTH  1024
 
+typedef struct ecP256PublicKey {
+  uint8_t& operator[](int i) { return key[i]; }
+  uint8_t* bytes() { return key; }
+  size_t length() { return sizeof(key); }
+  uint8_t key[ECP256_CERT_PUBLIC_KEY_LENGTH];
+} ecP256PublicKey;
+
 /******************************************************************************
  * CLASS DECLARATION
  ******************************************************************************/
@@ -55,8 +62,10 @@ public:
   inline long random(long min, long max) { return this->_secureElement.random(min, max); };
   inline long random(long max) { return this->_secureElement.random(max); };
 
-  inline int generatePrivateKey(int slot, byte publicKey[]) { return _secureElement.generatePrivateKey(slot, publicKey); };
-  inline int generatePublicKey(int slot, byte publicKey[]) { return _secureElement.generatePublicKey(slot, publicKey); };
+  inline __attribute__((deprecated)) int generatePrivateKey(int slot, byte publicKey[]) { return _secureElement.generatePrivateKey(slot, publicKey); };
+  inline __attribute__((deprecated)) int generatePublicKey(int slot, byte publicKey[]) { return _secureElement.generatePublicKey(slot, publicKey); };
+  inline int generatePrivateKey(int privateKeyId, ecP256PublicKey* publicKey) { return _secureElement.generatePrivateKey(privateKeyId, publicKey->bytes()); };
+  inline int generatePublicKey(int privateKeyId, ecP256PublicKey* publicKey) { return _secureElement.generatePublicKey(privateKeyId, publicKey->bytes()); };
 
   inline int ecdsaVerify(const byte message[], const byte signature[], const byte pubkey[]) { return _secureElement.ecdsaVerify(message, signature, pubkey); };
   inline int ecSign(int slot, const byte message[], byte signature[]) { return _secureElement.ecSign(slot, message, signature); };

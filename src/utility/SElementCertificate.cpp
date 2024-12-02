@@ -16,21 +16,21 @@
 
 int SElementCertificate::build(SecureElement & se, ECP256Certificate & cert, const int keySlot, bool newPrivateKey, bool selfSign)
 {
-  byte publicKey[ECP256_CERT_PUBLIC_KEY_LENGTH];
+  ecP256PublicKey publicKey;
   byte signature[ECP256_CERT_SIGNATURE_LENGTH];
 
   if(newPrivateKey) {
-    if (!se.generatePrivateKey(keySlot, publicKey)) {
+    if (!se.generatePrivateKey(keySlot, &publicKey)) {
       return 0;
     }
   } else {
-    if (!se.generatePublicKey(keySlot, publicKey)) {
+    if (!se.generatePublicKey(keySlot, &publicKey)) {
       return 0;
     }
   }
 
   /* Store public key in Certificate */
-  if (!cert.setPublicKey(publicKey, ECP256_CERT_PUBLIC_KEY_LENGTH)) {
+  if (!cert.setPublicKey(publicKey.bytes(), publicKey.length())) {
     return 0;
   }
 

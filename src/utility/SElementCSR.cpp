@@ -16,24 +16,26 @@
 
 int SElementCSR::build(SecureElement & se, ECP256Certificate & cert, const int keySlot, bool newPrivateKey)
 {
-  byte publicKey[ECP256_CERT_PUBLIC_KEY_LENGTH];
+  ecP256PublicKey publicKey;
   byte signature[ECP256_CERT_SIGNATURE_LENGTH];
 
   if (newPrivateKey) {
-    if (!se.generatePrivateKey(keySlot, publicKey)) {
+    if (!se.generatePrivateKey(keySlot, &publicKey)) {
       return 0;
     }
   } else {
-    if (!se.generatePublicKey(keySlot, publicKey)) {
+    if (!se.generatePublicKey(keySlot, &publicKey)) {
       return 0;
     }
   }
 
+  Serial.println(sizeof(publicKey.bytes()));
+
   /* Store public key in CSR */
-  if (!cert.setPublicKey(publicKey, ECP256_CERT_PUBLIC_KEY_LENGTH)) {
+  if (!cert.setPublicKey(publicKey.bytes(), publicKey.length())) {
     return 0;
   }
-  
+
   /* Build CSR */
   if (!cert.buildCSR()) {
     return 0;
